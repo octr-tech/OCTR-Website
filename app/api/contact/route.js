@@ -16,6 +16,7 @@ export async function POST(request) {
   const mailOptions = {
     from: process.env.SMTP_USER,
     to: 'arbaek@octrtech.com',
+    replyTo: email, // 👈 여기 추가
     subject: `Demo Request from ${name} – ${company}`,
     text: `
 Name: ${name}
