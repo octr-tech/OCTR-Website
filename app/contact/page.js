@@ -17,10 +17,27 @@ export default function Contact() {
     })
   }
 
-  const handleSubmit = (e) => {
+  const [status, setStatus] = useState(null)
+
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    alert('Thank you! We will contact you soon.')
-    setFormData({ name: '', email: '', company: '', phone: '', message: '' })
+    setStatus('sending')
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      })
+      const data = await res.json()
+      if (data.success) {
+        setStatus('success')
+        setFormData({ name: '', email: '', company: '', phone: '', message: '' })
+      } else {
+        setStatus('error')
+      }
+    } catch {
+      setStatus('error')
+    }
   }
 
   return (
@@ -55,8 +72,19 @@ export default function Contact() {
             <textarea name="message" value={formData.message} onChange={handleChange} rows="5" className="w-full px-4 py-2 border rounded" placeholder="Tell us about your building and energy goals..."></textarea>
           </div>
 
-          <button type="submit" className="w-full bg-teal-600 text-white py-3 rounded font-bold hover:bg-teal-700">
-            Send Demo Request
+          {status === 'success' && (
+            <p className="mb-4 text-green-600 font-semibold text-center">Thank you! We will contact you soon.</p>
+          )}
+          {status === 'error' && (
+            <p className="mb-4 text-red-600 font-semibold text-center">Something went wrong. Please try again.</p>
+          )}
+
+          <button
+            type="submit"
+            disabled={status === 'sending'}
+            className="w-full bg-teal-600 text-white py-3 rounded font-bold hover:bg-teal-700 disabled:opacity-60"
+          >
+            {status === 'sending' ? 'Sending...' : 'Send Demo Request'}
           </button>
         </form>
       </section>
