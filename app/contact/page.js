@@ -29,6 +29,7 @@ export default function Contact() {
         body: JSON.stringify(formData),
       })
       const data = await res.json()
+      console.log('API 응답:', data) // 이 줄 추가
       if (data.success) {
         setStatus('success')
         setFormData({ name: '', email: '', company: '', phone: '', message: '' })
