@@ -1,13 +1,19 @@
-import { Resend } from 'resend'
+import nodemailer from 'nodemailer'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.GMAIL_USER,
+    pass: process.env.GMAIL_PASS,
+  },
+})
 
 export async function POST(request) {
   const { name, email, company, phone, message } = await request.json()
 
   try {
-    await resend.emails.send({
-      from: 'OCTR Demo Request <onboarding@resend.dev>',
+    await transporter.sendMail({
+      from: `"OCTR Demo Request" <${process.env.GMAIL_USER}>`,
       to: 'arbaek@octrtech.com',
       replyTo: email,
       subject: `Demo Request from ${name} – ${company}`,
@@ -25,6 +31,6 @@ export async function POST(request) {
     return Response.json({ success: true })
   } catch (error) {
     console.error('Email send error:', error)
-    return Response.json({ success: false, error: 'Failed to send email' }, { status: 500 })
+    return Response.json({ success: false, error: error.message }, { status: 500 })
   }
 }
